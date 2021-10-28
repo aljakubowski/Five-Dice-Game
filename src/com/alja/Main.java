@@ -5,95 +5,92 @@ import java.util.Scanner;
 public class Main {
 
     public static Scanner scanner = new Scanner(System.in);
-    public static Player player1 = new Player("Tenet");
 
     public static void main(String[] args) {
 
-        boolean gameIsContinued = true;
-        boolean quit = false;
-        int select = 0;
+//        boolean gameIsContinued = true;
+//        boolean quit = false;
+//        int select = 0;
 
-        System.out.println("== Welcome to the Dice Game ==");
+        boolean chooseOrder = false;
+
+        System.out.println("== Welcome to the Five Dice Game ==");
         System.out.println("");
 
+        System.out.println("Player 1 name:");
+        Player player1 = new Player(scanner.nextLine());
+        System.out.println("Player 2 name:");
+        Player player2 = new Player(scanner.nextLine());
 
-        while (!quit) {
+        GameLoop gameLoop1 = new GameLoop(player1);
+        GameLoop gameLoop2 = new GameLoop(player2);
 
-            //  == GAME LOOP (before 60)
-            while (!player1.hasReachedInitSixty) {
-                // == initial message
-                System.out.println("initial roll: you must get 60 points at once\n press 'Enter' to roll");
+
+        // order rolls
+        while (!chooseOrder) {
+            while ((player1.roundPts == player2.roundPts)) {
+                System.out.println("Player " + player1.getName() + " rolls:");
                 scanner.nextLine();
                 player1.rollDice(player1.dicesToRoll);
-                // == 60 points level
-                while (player1.roundPts < 60) {
-                    if (player1.canRoll) {
-                        System.out.println("'Enter' to roll until you get 60 pts (" + player1.roundPts + "/60 gained)");
-                        scanner.nextLine();
-                        player1.rollDice(player1.dicesToRoll);
-                    } else {
-                        System.out.println("\t______________________________________________");
-                        System.out.println("\t* can't roll anymore - your points are cleared\n\t* Try again");
-                        player1.resetCurrentRound();
-                    }
-                }
-                player1.hasReachedInitSixty = true;
 
-                System.out.println();
-                System.out.println("\t* You've reached 60 point level *");
-                System.out.println();
-
-            // == GAME LOOP (after 60)
-            while (gameIsContinued && player1.hasReachedInitSixty) {
-
-                System.out.println("________________________________________________");
-                System.out.println("Total points: " + player1.getTotalPoints());
-                System.out.println("This round points: " + player1.roundPts + " | " + player1.dicesToRoll + " dices left  choose:");
-
-                System.out.println(" (enter) roll\t(1) save points \t\t(9) quit");
-                System.out.println("________________________________________________");
-
-
-                String choose = scanner.nextLine();
-                if (!choose.isEmpty()) {
-                    select = Integer.parseInt(choose);
-                } else {
-                    player1.rollDice(player1.dicesToRoll);
-                    if (!player1.canRoll) {
-                        player1.resetCurrentRound();
-                        if (player1.getTotalPoints() <= 0) {
-                            player1.hasReachedInitSixty = false;
-                        }
-                    }
-                }
-
-
-                switch (select) {
-                    case 1:
-                        System.out.println("Saved: " + player1.roundPts + " points to Total");
-                        player1.savePoints();
-                        player1.resetCurrentRound();
-                        select = 0;
-                        break;
-                    case 9:
-                        System.out.println("quitting...");
-                        player1.canRoll = false;
-                        gameIsContinued = false;
-                        quit = true;
-                        break;
-                }
+                System.out.println("Player " + player2.getName() + " rolls:");
+                scanner.nextLine();
+                player2.rollDice(player2.dicesToRoll);
             }
 
-        }
-            quit = true;
+            if (player1.roundPts > player2.roundPts) {
+                System.out.println("\t\t\t* Player: " + player1.getName() + " starts *");
+                player1.setCurrent(true);
+                player2.setCurrent(false);
+            } else {
+                System.out.println("*" + player2.getName() + " start *");
+                player1.setCurrent(false);
+                player2.setCurrent(true);
+            }
+            player1.resetCurrentRound();
+            player2.resetCurrentRound();
+            chooseOrder = true;
         }
 
 
-//            System.out.println("What is your name?");
-//
+        // == WORKING ==
+//            System.out.println("Player 1 name:");
+//            Player player1 = new Player(scanner.nextLine());
+//            System.out.println("Player 2 name:");
 //            Player player2 = new Player(scanner.nextLine());
-//
-//            System.out.println("Hello " + player2.getName() +
+
+//            GameLoop gameLoop1 = new GameLoop(player1);
+//            GameLoop gameLoop2 = new GameLoop(player2);
+
+
+//            player1.setCurrent(true);
+//            player2.setCurrent(false);
+
+
+        // == loop that changes players until gameLoop is broken
+        while (player1.isCurrent || player2.isCurrent && !player1.hasWon && !player2.hasWon) {
+
+            String totalPointsTable = "================================================\n" +
+                    "\t * player:\t" + player1.getName() + ":\t\t" + player1.getTotalPoints() +
+                    "\n\t * player:\t" + player2.getName() + ":\t\t" + player2.getTotalPoints() +
+                    "\n================================================";
+            System.out.println(totalPointsTable);
+
+
+
+            if (player1.isCurrent) {
+
+                gameLoop1.gameLoop();
+                // == switch players ==
+                player2.setCurrent(true);
+
+            } else if (player2.isCurrent) {
+
+                gameLoop2.gameLoop();
+                // == switch players ==
+                player1.setCurrent(true);
+            }
+        }
 
     }
 }

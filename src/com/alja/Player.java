@@ -3,16 +3,19 @@ package com.alja;
 public class Player {
 
     public String name;
-    int moveCount;
-    int totalPoints;
+    public int moveCount;
+    public int totalPoints;
 
     public int roundPts;
     public int currentRollPts;
 
     public int dicesToRoll;
-    boolean canRoll;
+    public boolean canRoll;
 
-    boolean hasReachedInitSixty;
+    public boolean hasReachedInitSixty;
+    public boolean isCurrent;
+
+    public boolean hasWon;
 
 
     public DiceRoll dice = new DiceRoll();
@@ -30,7 +33,9 @@ public class Player {
         this.dicesToRoll =5;
         this.canRoll = true;
 
-        hasReachedInitSixty = false;
+        this.hasReachedInitSixty = false;
+        this.hasWon = false;
+
     }
 
 
@@ -58,6 +63,7 @@ public class Player {
             this.canRoll = false;
         }
         System.out.println("\t| Current roll points = " + currentRollPts + " | " + message + " | ");
+        System.out.println("\t| Player: " + name);
         this.currentRollPts =0;
         return currentRollPts;
     }
@@ -71,8 +77,7 @@ public class Player {
     }
 
     public void savePoints(){
-        totalPoints += roundPts;
-        moveCount ++;
+        this.totalPoints += roundPts;
     }
 
     public void subtractTotalPts(){
@@ -94,5 +99,9 @@ public class Player {
 
     public int getMoveCount() {
         return moveCount;
+    }
+
+    public void setCurrent(boolean current) {
+        isCurrent = current;
     }
 }
