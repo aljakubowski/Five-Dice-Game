@@ -8,18 +8,15 @@ public class GameLoop {
 
     private final Player player;
 
-    private boolean reached60message = true;
+    private boolean reachedEntryLevel = true;
     private int select = 0;
-    private int pointsToWin = 200;
-
-    private boolean gameIsContinued = true; // IS NEEDED ?
-
+    private final int entryPtsLevel = 60;
+    private final int pointsToWin = 500;
 
     public GameLoop(Player player) {
         this.player = player;
     }
-
-
+    // == method that handles rolling dice ==
     public void gameLoop() {
 
         boolean quit = false;
@@ -28,106 +25,95 @@ public class GameLoop {
 
             String turnMessage = "\n\t\t\t\t       *\n\t\t\t\t    " + player.getName() + " - turn\n\t\t\t\t       *";
 
-
-            //  == GAME LOOP (before 60)
-            while (!player.hasReachedInitSixty && player.isCurrent) {
+            //  == GAME LOOP - before -entryPtsLevel- pts ==
+            if (!player.hasReachedEntryLevel() && player.isCurrent()) {
                 System.out.println(turnMessage);
 
-                // == initial message
-                System.out.println(" - initial roll: you must get 60 points in this round -\n\t\t\t press 'Enter' to roll");
+                System.out.println(" - initial roll: you must get " + entryPtsLevel +
+                        " points in this round -\n\t\t\t press 'Enter' to roll");
                 scanner.nextLine();
-                player.rollDice(player.dicesToRoll);
-                // == 60 points level
-                while (player.roundPts < 60) {
-                    if (player.canRoll) {
-                        System.out.println("\t| " + player.roundPts + "/60 points gained|");
+                player.rollDice(player.getDicesToRoll());
+
+                while (player.getRoundPts() < entryPtsLevel) {
+                    if (player.canRoll()) {
+                        System.out.println("\t| " + player.getRoundPts() + "/" + entryPtsLevel + " points gained|");
                         System.out.println("\t\t\tpress 'Enter' to roll");
                         scanner.nextLine();
-                        player.rollDice(player.dicesToRoll);
+                        player.rollDice(player.getDicesToRoll());
                     } else {
                         System.out.println("\t___________________________________________");
-                        System.out.println("\t* FAILED - your points are cleared\n\t* Try again");
+                        System.out.println("\t- FAILED - your points are cleared\n\t- Try again");
                         player.resetCurrentRound();
                         player.setCurrent(false);
                         break;
                     }
                 }
-                break;
+            }
+            
+            // == message after achieving entry level ==
+            if (player.isCurrent() && reachedEntryLevel) {
+                player.setHasReachedEntryLevel(true);
+                System.out.println("\n\t* " + player.getName() + " - reached " + entryPtsLevel + " points level *\n");
+                reachedEntryLevel = false;
             }
 
-            if (player.isCurrent) {
-                player.hasReachedInitSixty = true;
-                if (reached60message) {
-                    System.out.println("");
-                    System.out.println("\t* " + player.getName() + " - reached 60 point level *");
-                    System.out.println();
-                    reached60message = false;
-                }
-            } else {
-                break;
-            }
-
-
-            // == GAME LOOP (after 60)
-            while (gameIsContinued && player.hasReachedInitSixty && player.isCurrent) {
+            // == GAME LOOP - after -entryPtsLevel- pts ==
+            while (player.hasReachedEntryLevel() && player.isCurrent() && !player.wantsQuit()) {
 
                 System.out.println(turnMessage);
 
                 System.out.println("________________________________________________");
-                System.out.println("This round points: " + player.roundPts + "|\t\t\t Total points: " + player.getTotalPoints());
+                System.out.println("This round points: " + player.getRoundPts() +
+                        "|\t\t\t Total points: " + player.getTotalPoints());
                 System.out.println("Player: " + player.getName() + " |\t\t\t\t choose:");
 
                 System.out.println("\n'Enter' to roll\t(1) save points\t\t(9) quit");
                 System.out.println("________________________________________________");
 
-
+                // == choosing mechanism ==
                 String choose = scanner.nextLine();
                 try {
                     if (!choose.isEmpty()) {
                         select = Integer.parseInt(choose);
                     } else {
-                        player.rollDice(player.dicesToRoll);
+                        player.rollDice(player.getDicesToRoll());
 
-                        // == mechanism that allows to win
-                        if (player.getTotalPoints() + player.roundPts  == pointsToWin){
+                        // == mechanism that checks if game is won ==
+                        if (player.getTotalPoints() + player.getRoundPts() == pointsToWin) {
 
-                            System.out.println("+++++++++++++++++++++++++++++++++++++++++++");
-                            System.out.println("\n\n\n");
-                            System.out.println("\t\t*!*!*!*! Player: "  + " WON !*!*!*!\n\n\t\t\t\t GAME OVER\t:D");
-                            System.out.println("\n\n\n");
-                            System.out.println("+++++++++++++++++++++++++++++++++++++++++++");
-
+                            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++\n");
+                            System.out.println("\t\t\t\t\t! ! ! !\n\t\t\t\tPlayer: " + player.getName() +
+                                    "\n\t\t\t\t\t  WON\n\t\t\t\t\t! ! ! !\n\n\t\t\t\t GAME OVER\t:D\n");
+                            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++");
                             player.savePoints();
-                            player.hasWon = true;
+                            player.setHasWon(true);
                             this.select = 9;
                             break;
-                        } else if (player.getTotalPoints() + player.roundPts  > pointsToWin){
-                            System.out.println("\t * To many points, current round is cleared");
-                            player.canRoll = false;
+                        } else if (player.getTotalPoints() + player.getRoundPts() > pointsToWin) {
+                            System.out.println("\t * Too many points, current round points are cleared");
+                            player.setCanRoll(false);
                         }
-
-
-                        if (!player.canRoll) {
-
+                        // == mechanism that checks if player can roll ==
+                        if (!player.canRoll()) {
                             player.setCurrent(false);
                             player.resetCurrentRound();
                             if (player.getTotalPoints() <= 0) {
-                                player.hasReachedInitSixty = false;
+                                player.setHasReachedEntryLevel(true);
                             }
                             break;
                         }
-
-
                     }
                 } catch (Exception e) {
                     System.out.println("Failed, select: 'Enter', 1 or 9");
                 }
-
-
                 switch (select) {
                     case 1:
+                        if (player.getRoundPts()==0){
+                            System.out.println("\t" + player.getName() + " - Failed - You have not any points!");
+                            break;
+                        }
                         player.setCurrent(false);
-                        System.out.println("Player " + player.getName() + " Saved: " + player.roundPts + " points");
+                        System.out.println("Player " + player.getName() + " Saved: " + player.getRoundPts() + " points");
                         player.savePoints();
                         player.resetCurrentRound();
                         select = 0;
@@ -135,16 +121,12 @@ public class GameLoop {
 
                     case 9:
                         System.out.println("quitting...");
-                        player.canRoll = false;
-                        gameIsContinued = false;
-                        quit = true;
+                        player.setWantsQuit(true);
                         break;
                 }
-//                break;
             }
             quit = true;
         }
     }
-
 
 }

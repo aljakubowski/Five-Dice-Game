@@ -7,36 +7,40 @@ import java.util.Random;
 
 public class DiceRoll {
 
-    int availableDicesAfterRoll;
+    private int availableDicesAfterRoll;
 
     public DiceRoll() {
     }
 
-    public void resetDice(){
-        this.availableDicesAfterRoll=0;
+    public int getAvailableDicesAfterRoll() {
+        return availableDicesAfterRoll;
     }
 
-    public int roll(int numOfDices){
+    public void resetDice() {
+        this.availableDicesAfterRoll = 0;
+    }
+
+    public int roll(int numOfDices) {
 
         ArrayList<Integer> diceRoll = getRandomNumbers(numOfDices);
         System.out.println("\t\t\t\t[*  *  *  *  *]\nDices on board: " + diceRoll);
 
-        HashMap<Integer, Integer> mapOfRoll = createMap(diceRoll);
+        Map<Integer, Integer> mapOfRoll = createMap(diceRoll);
         int points = countPoints(mapOfRoll);
         setDicesLeft(mapOfRoll, numOfDices);
         return points;
     }
 
-    private int setDicesLeft(HashMap<Integer, Integer> rollSet, int numOfDices){
+    private void setDicesLeft(Map<Integer, Integer> rollSet, int numOfDices) {
         int availableDices = numOfDices;
 
-        if (rollSet.containsKey(1)){
+        if (rollSet.containsKey(1)) {
             availableDices = availableDices - rollSet.get(1);
         }
-        if (rollSet.containsKey(5)){
+        if (rollSet.containsKey(5)) {
             availableDices = availableDices - rollSet.get(5);
         }
-        for (Map.Entry<Integer, Integer> e : rollSet.entrySet()){
+        for (Map.Entry<Integer, Integer> e : rollSet.entrySet()) {
             if (!(e.getKey() == 1 || e.getKey() == 5)) {
                 if (e.getValue() >= 3) {
                     availableDices -= e.getValue();
@@ -44,12 +48,10 @@ public class DiceRoll {
             }
         }
         this.availableDicesAfterRoll = availableDices;
-        return availableDices;
     }
 
-    private int countPoints(HashMap<Integer, Integer> rollSet) {
-
-        int points =0;
+    private int countPoints(Map<Integer, Integer> rollSet) {
+        int points = 0;
 
         if (rollSet.containsKey(1)) {
             if (rollSet.get(1) == 1) {
@@ -93,21 +95,20 @@ public class DiceRoll {
         return points;
     }
 
-    private ArrayList<Integer> getRandomNumbers(int num){
+    private ArrayList<Integer> getRandomNumbers(int num) {
         ArrayList<Integer> fiveNumbers = new ArrayList<>();
-
         Random randomFive = new Random();
-        for (int i =0; i<=num-1; i++){
-            fiveNumbers.add(randomFive.ints(1,7)
+
+        for (int i = 0; i <= num - 1; i++) {
+            fiveNumbers.add(randomFive.ints(1, 7)
                     .findFirst()
                     .getAsInt());
         }
         return fiveNumbers;
     }
 
-    private HashMap<Integer, Integer> createMap(ArrayList<Integer> rollResult){ // add dices count
-
-        HashMap<Integer, Integer> rollSet = new HashMap<>();
+    private Map<Integer, Integer> createMap(ArrayList<Integer> rollResult) {
+        Map<Integer, Integer> rollSet = new HashMap<>();
 
         int countONEs = 0;
         int countTWOs = 0;
@@ -116,34 +117,34 @@ public class DiceRoll {
         int countFIVEs = 0;
         int countSIXs = 0;
 
-            for (int i = 0; i <= rollResult.size()-1; i++) {
-                switch (rollResult.get(i)){
-                    case 1:
-                        countONEs ++;
-                        rollSet.put(1,countONEs);
-                        break;
-                    case 2:
-                        countTWOs ++;
-                        rollSet.put(2,countTWOs);
-                        break;
-                    case 3:
-                        countTHREEs ++;
-                        rollSet.put(3,countTHREEs);
-                        break;
-                    case 4:
-                        countFOURs ++;
-                        rollSet.put(4,countFOURs);
-                        break;
-                    case 5:
-                        countFIVEs ++;
-                        rollSet.put(5,countFIVEs);
-                        break;
-                    case 6:
-                        countSIXs ++;
-                        rollSet.put(6,countSIXs);
-                        break;
-                }
+        for (int i = 0; i <= rollResult.size() - 1; i++) {
+            switch (rollResult.get(i)) {
+                case 1:
+                    countONEs++;
+                    rollSet.put(1, countONEs);
+                    break;
+                case 2:
+                    countTWOs++;
+                    rollSet.put(2, countTWOs);
+                    break;
+                case 3:
+                    countTHREEs++;
+                    rollSet.put(3, countTHREEs);
+                    break;
+                case 4:
+                    countFOURs++;
+                    rollSet.put(4, countFOURs);
+                    break;
+                case 5:
+                    countFIVEs++;
+                    rollSet.put(5, countFIVEs);
+                    break;
+                case 6:
+                    countSIXs++;
+                    rollSet.put(6, countSIXs);
+                    break;
             }
+        }
         for (Map.Entry<Integer, Integer> e : rollSet.entrySet()) {
             System.out.println("\t\t\t\t[" + e.getKey() + "] times: " + e.getValue());
         }

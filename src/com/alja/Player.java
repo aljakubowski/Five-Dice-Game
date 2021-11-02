@@ -2,86 +2,66 @@ package com.alja;
 
 public class Player {
 
-    public String name;
-    public int moveCount;
-    public int totalPoints;
+    public final String name;
 
-    public int roundPts;
-    public int currentRollPts;
+    private int totalPoints;
+    private int roundPts;
+    private int currentRollPts;
 
-    public int dicesToRoll;
-    public boolean canRoll;
+    private int dicesToRoll;
 
-    public boolean hasReachedInitSixty;
-    public boolean isCurrent;
+    private boolean isCurrent;
+    private boolean canRoll;
+    private boolean hasReachedEntryLevel;
+    private boolean hasWon;
+    private boolean wantsQuit;
 
-    public boolean hasWon;
-
-
-    public DiceRoll dice = new DiceRoll();
-
+    private final DiceRoll dice = new DiceRoll();
 
     public Player(String name) {
         this.name = name;
-
         this.totalPoints = 0;
-        this.moveCount = 0;
-
-        this.roundPts =0;
-        this.currentRollPts=0;
-
-        this.dicesToRoll =5;
+        this.roundPts = 0;
+        this.currentRollPts = 0;
+        this.dicesToRoll = 5;
         this.canRoll = true;
-
-        this.hasReachedInitSixty = false;
+        this.hasReachedEntryLevel = false;
         this.hasWon = false;
-
+        this.wantsQuit = false;
     }
 
-
-    public int rollDice(int numOfDices){
-
+    public void rollDice(int numOfDices) {
         String message;
 
         this.currentRollPts = dice.roll(numOfDices);
-        this.dicesToRoll = dice.availableDicesAfterRoll;
+        this.dicesToRoll = dice.getAvailableDicesAfterRoll();
 
-        if (this.currentRollPts >0){
+        if (this.currentRollPts > 0) {
             this.roundPts += this.currentRollPts;
 
-            if (dicesToRoll >0){
-                dicesToRoll= dice.availableDicesAfterRoll;
+            if (dicesToRoll > 0) {
+                dicesToRoll = dice.getAvailableDicesAfterRoll();
             }
-            if (dicesToRoll ==0){
-                dicesToRoll= 5;
+            if (dicesToRoll == 0) {
+                dicesToRoll = 5;
             }
             this.canRoll = true;
             message = "dices left: " + this.dicesToRoll;
         } else {
-
             message = "dices left: 0";
             this.canRoll = false;
         }
         System.out.println("\t| Current roll points = " + currentRollPts + " | " + message + " | ");
         System.out.println("\t| Player: " + name);
-        this.currentRollPts =0;
-        return currentRollPts;
+        this.currentRollPts = 0;
     }
 
-    public void resetCurrentRound(){
+    public void resetCurrentRound() {
         this.canRoll = true;
         this.roundPts = 0;
         this.currentRollPts = 0;
         this.dicesToRoll = 5;
         dice.resetDice();
-    }
-
-    public void savePoints(){
-        this.totalPoints += roundPts;
-    }
-
-    public void subtractTotalPts(){
-        totalPoints -=100;
     }
 
     public String getName() {
@@ -92,13 +72,52 @@ public class Player {
         return this.totalPoints;
     }
 
-    public void getCurrentRollPoints() {
-        System.out.println("Player: current points: " + this.currentRollPts);
+    public int getRoundPts() {
+        return roundPts;
     }
 
+    public int getDicesToRoll() {
+        return dicesToRoll;
+    }
 
-    public int getMoveCount() {
-        return moveCount;
+    public boolean isCurrent() {
+        return isCurrent;
+    }
+
+    public boolean canRoll() {
+        return canRoll;
+    }
+
+    public void setCanRoll(boolean canRoll) {
+        this.canRoll = canRoll;
+    }
+
+    public boolean hasReachedEntryLevel() {
+        return hasReachedEntryLevel;
+    }
+
+    public void setHasReachedEntryLevel(boolean hasReachedEntryLevel) {
+        this.hasReachedEntryLevel = hasReachedEntryLevel;
+    }
+
+    public boolean hasWon() {
+        return hasWon;
+    }
+
+    public void setHasWon(boolean hasWon) {
+        this.hasWon = hasWon;
+    }
+
+    public boolean wantsQuit() {
+        return wantsQuit;
+    }
+
+    public void setWantsQuit(boolean wantsQuit) {
+        this.wantsQuit = wantsQuit;
+    }
+
+    public void savePoints() {
+        this.totalPoints += roundPts;
     }
 
     public void setCurrent(boolean current) {
