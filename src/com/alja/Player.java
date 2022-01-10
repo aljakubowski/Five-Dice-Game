@@ -30,12 +30,16 @@ public class Player {
         this.wantsQuit = false;
     }
 
+    // == method that handles a round of dice rolling ==
     public void rollDice(int numOfDices) {
         String message;
+        System.out.println("\t|> " + name + " rolled:");
 
+        // = takes Dice object and performs rolling method on it =
         this.currentRollPts = dice.roll(numOfDices);
         this.dicesToRoll = dice.getAvailableDicesAfterRoll();
 
+        // = loop that checks if further rolls are available - game logic =
         if (this.currentRollPts > 0) {
             this.roundPts += this.currentRollPts;
 
@@ -51,8 +55,7 @@ public class Player {
             message = "dices left: 0";
             this.canRoll = false;
         }
-        System.out.println("\t| Current roll points = " + currentRollPts + " | " + message + " | ");
-        System.out.println("\t| Player: " + name);
+        System.out.println("\t|> Current roll points = " + currentRollPts + " | " + message + " | ");
         this.currentRollPts = 0;
     }
 
