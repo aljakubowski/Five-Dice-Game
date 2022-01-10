@@ -10,7 +10,7 @@ public class GameLoop {
 
     private boolean entryLevelMessageFlag = true;
     private int select = 0;
-    private final int entryPtsLevel = 6;
+    private final int entryPtsLevel = 60;
     private final int pointsToWin = 1000;
 
     public GameLoop(Player player) {
